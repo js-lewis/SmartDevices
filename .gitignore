@@ -1,3 +1,9 @@
 .classpath
 .project
 .settings
+bin
+src/chp08
+src/edu/fmarion/chp09
+src/edu/fmarion/chp10
+src/edu/fmarion/chp12
+src/edu/fmarion/exam02
