@@ -4,7 +4,7 @@ import java.util.ArrayList;
 
 import edu.fmarion.chp13.smartDevices.messages.TestMessage;
 import edu.fmarion.chp13.smartDevices.messages.TestQueue;
-import edu.fmarion.chp13.smartDevices.server.key.TestSmartThingServer;
+import edu.fmarion.chp13.smartDevices.server.TestSmartThingServer;
 
 public class Main
 {

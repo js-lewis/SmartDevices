@@ -63,20 +63,31 @@ public class TestSmartThingServer extends UnitTest
 		super(verbose);
 	}
 
+	/**
+	 * Builds a test configFile for creating SmartThingServer from file input.
+	 *
+	 * @return file name of created configuration file
+	 */
 	private String buildConfigFile()
 	{
-		String fname = UUID.randomUUID().toString();
+		// generate a random file name for config file
+		String fname = UUID.randomUUID().toString()+".cfg";
 
+		// try-with-resources
 		try
 		(
+			// opened only in the context of this try block
 			PrintWriter fout = new PrintWriter(fname)
 		)
 		{
-			fout.println("name");
-			fout.print("password");
+			// write a server name and password out to file
+			fout.println("serv01");
+			fout.print("12345");
+			// file is auto closed at the end of this try block context (here)
 		}
 		catch (FileNotFoundException e)
 		{
+			// this shouldn't be possible
 			e.printStackTrace();
 			assert(false);
 		}
@@ -85,8 +96,10 @@ public class TestSmartThingServer extends UnitTest
 	}
 	private boolean testConfigFile()
 	{
-		boolean good = true;
-		String fname = buildConfigFile();
+		boolean good = true; // assume test is good
+
+		String fname = buildConfigFile(); // get a temp file for test
+
 		try
 		{
 			server = new SmartThingServer(fname);
@@ -96,6 +109,7 @@ public class TestSmartThingServer extends UnitTest
 				(
 				 "\tCreating SmartThingServer from file successful."
 				);
+			server.sendMsg(new Message("to", "from","content"));
 
 			// clearing out file
 			PrintWriter fout = new PrintWriter(file);
@@ -120,6 +134,12 @@ public class TestSmartThingServer extends UnitTest
 				System.out.printf("\tReceived:%n>>%s<<%n", e.getMessage());
 			}
 		}
+		finally
+		{
+			File file = new File(fname);
+			if ( file.exists() )
+				file.delete();
+		}
 
 		return good;
 	}
@@ -127,7 +147,6 @@ public class TestSmartThingServer extends UnitTest
 	private boolean testLogon()
 	{
 		boolean good = true;
-
 		server = new SmartThingServer("name", "password");
 
 		try
@@ -175,7 +194,6 @@ public class TestSmartThingServer extends UnitTest
 	private boolean testUpdatePassword()
 	{
 		boolean good = true;
-
 		server = new SmartThingServer("name", "password");
 
 		good &= server.updatePassword("password", "12345");
@@ -230,6 +248,7 @@ public class TestSmartThingServer extends UnitTest
 			System.out.println("\tconfigFile **FAILED**");
 		System.out.println();
 
+
 		// Test logon server
 		System.out.println("Testing SmartThingServer.logon()");
 		if ( testLogon() )
@@ -238,6 +257,7 @@ public class TestSmartThingServer extends UnitTest
 			System.out.println("\tSmartThingServer.logon() **FAILED**");
 		System.out.println();
 
+
 		// Test updatePassword server
 		System.out.println("Testing SmartThingServer.updatePassword()");
 		if ( testUpdatePassword() )
@@ -245,6 +265,7 @@ public class TestSmartThingServer extends UnitTest
 		else
 			System.out.println("\tSmartThingServer.updatePassword() **FAILED**");
 		System.out.println();
+
 
 		// Test running server
 		System.out.println("Testing SmartThingServer.run()");
