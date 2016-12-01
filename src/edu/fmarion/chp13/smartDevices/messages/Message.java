@@ -60,10 +60,12 @@ public class Message
 	public String toString()
 	{
 		String message = new String();
-
+		message += "==========================\n";
 		message += "To:\t" + to + "\n";
 		message += "From:\t" + from + "\n";
-		message += "Content:\t" + content + "\n";
+		message += "-----------------------\n";
+		message += "Content:\n\t" + content + "\n";
+		message += "==========================\n";
 
 		return message;
 	}
