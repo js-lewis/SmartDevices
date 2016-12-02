@@ -17,6 +17,8 @@ public class FileFormatException extends NoSuchElementException
 		// TODO Initialize attributes ArrayList and add
 		//	parameter to list
 		// Points:  / 5
+		attributes = new ArrayList<String>();
+		attributes.add(attribute);
 	}
 
 
@@ -29,6 +31,7 @@ public class FileFormatException extends NoSuchElementException
 	{
 		// TODO Add String parameter to attributes ArrayList
 		// Points:  / 5
+		this.attributes.add(attribute);
 	}
 
 
@@ -46,7 +49,14 @@ public class FileFormatException extends NoSuchElementException
 	{
 		// TODO create and return a String of the correct form
 		// Points: / 10
-		return null;
+		String msg = new String();
+
+		for ( int i=0; i<attributes.size()-1; ++i )
+			msg += "Missing " + attributes.get(i) + ".\n";
+
+		msg += "Missing " + attributes.get(attributes.size()-1) + ".";
+
+		return msg;
 	}
 
 	// Package-level access. This should be okay as the structure is

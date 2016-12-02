@@ -9,5 +9,6 @@ public class ConnectionException extends Exception
 		// TODO Use super class's constructor to set message from String
 		// parameter.
 		// Points:  / 5
+		super(msg);
 	}
 }
