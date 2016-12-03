@@ -8,60 +8,9 @@ import java.util.UUID;
 import edu.fmarion.chp13.smartDevices.messages.Message;
 import edu.fmarion.chp13.smartDevices.tests.UnitTest;
 
-class Device extends Object implements SmartThing
+
+public class SmartThingServerTest extends UnitTest
 {
-	boolean verbose;
-	String name;
-	int received = 0;
-	int replied = 0;
-
-	public Device(String name, boolean verbose)
-	{
-		this.name = name;
-		this.verbose = verbose;
-	}
-
-	@Override
-	public String getName()
-	{
-		return name;
-	}
-
-	@Override
-	public Message receiveMsg(Message msg)
-	{
-		if ( this.verbose )
-			System.out.println("\tDevice received:\n" + msg);
-
-		if ( this.received++ == 0 )
-		{
-			Message reply =
-			 new Message(msg.from(), msg.to(), "Message Received!");
-
-			if ( this.verbose )
-				System.out.println("\tDevice replied:\n" + reply);
-
-			++this.replied;
-			return reply;
-		}
-		else
-		{
-			if ( this.verbose )
-				System.out.println("\tDevice replied: null");
-
-			return null;
-		}
-	}
-}
-
-public class TestSmartThingServer extends UnitTest
-{
-	private SmartThingServer server;
-
-	public TestSmartThingServer(boolean verbose)
-	{
-		super(verbose);
-	}
 
 	/**
 	 * Builds a test configFile for creating SmartThingServer from file input.
@@ -102,7 +51,7 @@ public class TestSmartThingServer extends UnitTest
 
 		try
 		{
-			server = new SmartThingServer(fname);
+			SmartThingServer server = new SmartThingServer(fname);
 			File file = new File(fname);
 			if ( this.verbose )
 				System.out.println
@@ -147,11 +96,11 @@ public class TestSmartThingServer extends UnitTest
 	private boolean testLogon()
 	{
 		boolean good = true;
-		server = new SmartThingServer("name", "password");
+		SmartThingServer server = new SmartThingServer("name", "password");
 
 		try
 		{
-			server.logon(new Device("dev", this.verbose), "password");
+			server.logon(new SmartThingTester(), "password");
 			if ( this.verbose )
 				System.out.println
 				(
@@ -170,7 +119,7 @@ public class TestSmartThingServer extends UnitTest
 
 		try
 		{
-			server.logon(new Device("dev", this.verbose), "passwor");
+			server.logon(new SmartThingTester(this.verbose), "passwor");
 			good = false;
 			if ( verbose )
 				System.out.println
@@ -194,7 +143,7 @@ public class TestSmartThingServer extends UnitTest
 	private boolean testUpdatePassword()
 	{
 		boolean good = true;
-		server = new SmartThingServer("name", "password");
+		SmartThingServer server = new SmartThingServer("name", "password");
 
 		good &= server.updatePassword("password", "12345");
 		if ( this.verbose )
@@ -215,10 +164,57 @@ public class TestSmartThingServer extends UnitTest
 	}
 
 
+	private boolean testMsgGetters()
+	{
+		boolean good = true;
+		SmartThingServer server = new SmartThingServer("srv17", "2468");
+
+		Message[] msgs = {
+			new Message("to0", "from0", "content0"),
+			new Message("to1", "from1", "content1")
+		};
+
+		for ( int i=0; i<msgs.length; ++i )
+			server.sendMsg(msgs[i]);
+
+		Message[] srvMsgs;
+		try
+		{
+			if ( verbose )
+				System.out.println("\tTesting getter w/ incorrect password");
+			srvMsgs = server.getInMsgs("246");
+			good = false;
+		}
+		catch (IllegalArgumentException e)
+		{
+			if ( verbose )
+				System.out.println("\tException correctly generated.");
+			srvMsgs = server.getInMsgs("2468");
+		}
+
+		good &= srvMsgs.length == msgs.length;
+
+		for ( int i=0; i<srvMsgs.length; ++i )
+		{
+			good &= srvMsgs[i].to().equals(msgs[i].to()) &&
+			 srvMsgs[i].from().equals(msgs[i].from()) &&
+			 srvMsgs[i].content().equals(msgs[i].content());
+
+			if ( verbose )
+			{
+				System.out.print("\tExpected: \n" + msgs[i]);
+				System.out.print("\tGot: \n" + srvMsgs[i]);
+			}
+		}
+
+		return good;
+	}
+
+
 	private boolean testRun()
 	{
-		Device thing = new Device("dev", this.verbose);
-		server = new SmartThingServer("name", "password");
+		SmartThing thing = new SmartThingTester(this.verbose);
+		SmartThingServer server = new SmartThingServer("name", "password");
 
 		try
 		{
@@ -229,13 +225,22 @@ public class TestSmartThingServer extends UnitTest
 			throw new AssertionError("This should not be possible.");
 		}
 
-		server.sendMsg(new Message("dev", "notDev", "This message is for you."));
-		server.sendMsg(new Message("dev", "notDev", "This message is for you, too."));
+		server.sendMsg(
+		 new Message
+		 (
+		  thing.getName(), thing.getName(), "This message is for you."
+		 )
+		);
 		while ( server.run() );
 
-		return thing.received==2 && thing.replied==1;
+		return true;
 	}
 
+
+	public SmartThingServerTest(boolean verbose)
+	{
+		super(verbose);
+	}
 
 	@Override
 	public void run()
@@ -243,36 +248,39 @@ public class TestSmartThingServer extends UnitTest
 		// Test using config file
 		System.out.println("Testing SmartThingServer with config file");
 		if ( testConfigFile() )
-			System.out.println("\tconfigFile **PASSED**");
+			System.out.println("\t**PASSED**");
 		else
-			System.out.println("\tconfigFile **FAILED**");
-		System.out.println();
-
+			System.out.println("\t**FAILED**");
 
 		// Test logon server
 		System.out.println("Testing SmartThingServer.logon()");
 		if ( testLogon() )
-			System.out.println("\tSmartThingServer.logon() **PASSED**");
+			System.out.println("\t**PASSED**");
 		else
-			System.out.println("\tSmartThingServer.logon() **FAILED**");
-		System.out.println();
-
+			System.out.println("\t**FAILED**");
 
 		// Test updatePassword server
 		System.out.println("Testing SmartThingServer.updatePassword()");
 		if ( testUpdatePassword() )
-			System.out.println("\tSmartThingServer.updatePassword() **PASSED**");
+			System.out.println("\t**PASSED**");
 		else
-			System.out.println("\tSmartThingServer.updatePassword() **FAILED**");
-		System.out.println();
+			System.out.println("\t**FAILED**");
 
+		// Test Message Queue Getter
+		System.out.println("Testing SmartThingServer.getIn/OutMsgs()");
+		if ( testMsgGetters() )
+			System.out.println("\t**PASSED**");
+		else
+			System.out.println("\t**FAILED**");
 
 		// Test running server
 		System.out.println("Testing SmartThingServer.run()");
 		if ( testRun() )
-			System.out.println("\tSmartThingServer.run() **PASSED**");
+			System.out.println("\t**PASSED**");
 		else
-			System.out.println("\tSmartThingServer.run() **FAILED**");
+			System.out.println("\t**FAILED**");
+
+		System.out.println();
 	}
 
 }

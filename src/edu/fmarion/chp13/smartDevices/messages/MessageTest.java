@@ -2,10 +2,10 @@ package edu.fmarion.chp13.smartDevices.messages;
 
 import edu.fmarion.chp13.smartDevices.tests.UnitTest;
 
-public class TestMessage extends UnitTest
+public class MessageTest extends UnitTest
 {
 
-	public TestMessage(boolean verbose)
+	public MessageTest(boolean verbose)
 	{
 		super(verbose);
 	}
@@ -25,9 +25,13 @@ public class TestMessage extends UnitTest
 		String content = getHexString();
 
 		// build correct toString string
-		String toString = "To:\t" + to + "\n" +
-		 "From:\t" + from + "\n" +
-		 "Content:\t" + content + "\n";
+		String toString = new String();
+		toString += "==========================\n";
+		toString += "To:\t" + to + "\n";
+		toString += "From:\t" + from + "\n";
+		toString += "-----------------------\n";
+		toString += "Content:\n\t" + content + "\n";
+		toString += "==========================\n";
 
 		Message msg = new Message(to, from, content);
 
@@ -109,17 +113,15 @@ public class TestMessage extends UnitTest
 	{
 		System.out.println("Testing Message class constructor and getters:");
 		if ( test() )
-			System.out.println("\t**construtor and getters PASSED**");
+			System.out.println("\t**PASSED**");
 		else
-			System.out.println("\t**construtor and getters FAILED**");
-		System.out.println();
-
+			System.out.println("\t**FAILED**");
 
 		System.out.println("Testing Message constructor exceptions");
 		if ( ExceptionTest() )
-			System.out.println("\t**construtor exceptions PASSED**");
+			System.out.println("\t**PASSED**");
 		else
-			System.out.println("\t**construtor exceptions FAILED**");
+			System.out.println("\t**FAILED**");
 
 		System.out.println();
 	}

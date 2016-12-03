@@ -3,7 +3,7 @@ package edu.fmarion.chp13.smartDevices.messages;
 import edu.fmarion.chp13.smartDevices.tests.UnitTest;
 
 
-public class TestQueue extends UnitTest
+public class QueueTest extends UnitTest
 {
 	private int loops;
 	private Queue q; // Queue being tested
@@ -13,14 +13,14 @@ public class TestQueue extends UnitTest
 	 * loops must always be provided
 	 */
 	@SuppressWarnings("unused")
-	private TestQueue() { }
+	private QueueTest() { }
 
 	/**
 	 * This constructor should not be used in TestQueue. Some number of
 	 * loops must always be provided
 	 */
 	@SuppressWarnings("unused")
-	private TestQueue(boolean verbose) { }
+	private QueueTest(boolean verbose) { }
 
 	/**
 	 * Use when test verbosity should be minimum
@@ -29,7 +29,7 @@ public class TestQueue extends UnitTest
 	 *
 	 * @throws InvalidArgumentException when loops is not in range
 	 */
-	public TestQueue(int loops)
+	public QueueTest(int loops)
 	{
 		this(loops, false);
 	}
@@ -41,7 +41,7 @@ public class TestQueue extends UnitTest
 	 *
 	 * @throws InvalidArgumentException when loops is not in range
 	 */
-	public TestQueue(int loops, boolean verbose)
+	public QueueTest(int loops, boolean verbose)
 	{
 		if ( loops > 0 )
 			this.loops = loops;
@@ -191,24 +191,25 @@ public class TestQueue extends UnitTest
 		System.out.println("Testing Queue.push(): ");
 		this.q = new Queue();
 		if ( testPush() )
-			System.out.println("\t**push PASSED**\n");
+			System.out.println("\t**PASSED**");
 		else
-			System.err.println("\t**push FAILED**\n");
+			System.err.println("\t**FAILED**");
 
 		System.out.println("Testing Queue.pop(): ");
 		this.q = new Queue();
 		if ( testPop() )
-			System.out.println("\t**pop PASSED**\n");
+			System.out.println("\t**PASSED**");
 		else
-			System.err.println("\t**pop FAILED**\n");
+			System.err.println("\t**FAILED**");
 
 		System.out.println("Testing Queue.peak(): ");
 		this.q = new Queue();
 		if ( testPeak() )
-			System.out.println("\t**peak PASSED**\n");
+			System.out.println("\t**PASSED**");
 		else
-			System.err.println("\t**peak FAILED**\n");
+			System.err.println("\t**FAILED**");
 
+		System.out.println();
 	}
 
 }
